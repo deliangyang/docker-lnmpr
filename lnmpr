@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+APP=$1
+WORKING_DIR=$2
+DB_NAME=$3
+
+mkdir -p ${APP}
+cat docker-compose.yml | sed -e "s#{{WORKING_DIR}}#${WORKING_DIR}#g" | sed -e "s#{{DB_NAME}}#${DB_NAME}#g" > ${APP}/docker-compose.yml
+
+cp -r docker ${APP}
+cd ${APP}
+echo "docker-compose up"
+docker-compose up

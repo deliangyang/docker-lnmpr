@@ -1,0 +1,53 @@
+version: '2.0'
+services:
+  web:
+    build: ./docker/nginx
+    working_dir: /text
+    ports:
+      - "80:80"
+    links:
+      - php
+    volumes:
+      - /text:/text:rw
+      - /var/log/nginx/:/etc/nginx/logs/:rw
+      - /etc/nginx/:/etc/nignx/:rw
+    networks:
+      - code-network
+
+  mysql:
+    image: mysql:5.7
+    expose:
+      - "3306"
+    environment:
+      MYSQL_DATABASE: "auto"
+      MYSQL_ROOT_PASSWORD: "123123"
+    volumes:
+      - /var/mysql/data:/var/lib/mysql:rw
+    networks:
+      - code-network
+
+  php:
+    build: ./docker/php
+    working_dir: /text
+    expose:
+      - "9000"
+    links:
+      - mysql
+      - redis
+    volumes:
+      - /text:/data/wwwroot:rw
+    networks:
+      - code-network
+
+  redis:
+    image: redis:alpine
+    volumes:
+      - /etc/redis:/usr/local/etc/redis:rw
+    expose:
+      - "6379"
+    networks:
+      - code-network
+
+networks:
+  code-network:
+    driver: bridge
